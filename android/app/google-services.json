@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "340757827108",
+    "project_id": "karah-cbe77",
+    "storage_bucket": "karah-cbe77.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340757827108:android:9fe697ccf94261c9c792b1",
+        "android_client_info": {
+          "package_name": "com.propulse.karah"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "340757827108-aulboqbnlhf4qhtukpofja0dupgfebh8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANE4KLQwagf9vRQeFivlFh9J9BVFya37c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340757827108-aulboqbnlhf4qhtukpofja0dupgfebh8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
