@@ -1,3 +1,4 @@
+import 'package:canteen_food_ordering_app/models/commande.dart';
 import 'package:canteen_food_ordering_app/models/food.dart';
 import 'package:canteen_food_ordering_app/models/user.dart';
 import 'package:canteen_food_ordering_app/notifiers/authNotifier.dart';
@@ -6,7 +7,6 @@ import 'package:canteen_food_ordering_app/screens/login.dart';
 import 'package:canteen_food_ordering_app/screens/navigationBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -22,13 +22,32 @@ readData() {
   });
 }
 
-deleteData() {
-  DocumentReference documentReference =
+Future<void> deleteData(Commande commande) async {
+  /* DocumentReference documentReference =
       Firestore.instance.collection("commande").document();
-
-  documentReference.delete().whenComplete(() {
+  documentReference.delete().whenComplete(()  {
     print("La commande a étè supprimer avec success");
-  });
+  });*/
+  try {
+    //FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
+    DocumentReference documentReference =
+        Firestore.instance.collection('commande').document();
+    await documentReference
+        .collection('commande')
+        .document(commande.cmdID)
+        .delete()
+        .catchError((e) => print(e))
+        .then((value) => print("Success"));
+         var tst =commande.cmdID;
+    print('mozart est...................: $tst');
+  } catch (error) {
+    pr.hide().then((isHidden) {
+      print(isHidden);
+    });
+    toast("Failed to Remove from cart!");
+    print(error);
+    return;
+  }
 }
 
 void toast(String data) {

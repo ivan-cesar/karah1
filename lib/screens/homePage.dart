@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:canteen_food_ordering_app/apis/foodAPIs.dart';
-import 'package:canteen_food_ordering_app/models/order.dart';
+import 'package:canteen_food_ordering_app/models/commande.dart';
+import 'package:canteen_food_ordering_app/models/food.dart';
 import 'package:canteen_food_ordering_app/notifiers/authNotifier.dart';
 import 'package:canteen_food_ordering_app/screens/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:canteen_food_ordering_app/models/food.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,16 +16,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Commande _commande = new Commande();
   List<String> cartIds = new List<String>();
   List<Food> _foodItems = new List<Food>();
   //DropDownWidget createState() => DropDownWidget();
   String matin = 'matin';
   String soir = 'Après midi';
   var dropdownValue;
+  var rng = new Random();
+  var cmdID;
   DateTime pickedDate;
-  String nomPrenom,adresLivraison,quartiers,autreDetail,value,dateLivraison,nbrePoul, tel;
-  bool periode;
-     String bulbColor = '';
+  String nomPrenom,
+      adresLivraison,
+      quartiers,
+      autreDetail,
+      value,
+      dateLivraison,
+      nbrePoul,
+      tel,
+      periode,
+      commune;
+  String bulbColor = '';
   List<String> spinnerItems = <String>[
     'Abobo',
     'Adjamé',
@@ -49,6 +63,9 @@ class _HomePageState extends State<HomePage> {
     getCart(authNotifier.userDetails.uuid);
     super.initState();
     pickedDate = DateTime.now();
+    for (var i = 0; i < 10; i++) {
+    cmdID = rng.nextInt(100);
+  }
   }
 
   @override
@@ -77,18 +94,18 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(16.0),
-            child: 
-            Text(
-                  nomPrenom =  authNotifier.userDetails.displayName+" "+authNotifier.userDetails.displayLastName,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 30,
-                      fontFamily: 'MuseoModerno',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-          ),
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                nomPrenom = authNotifier.userDetails.displayName +
+                    " " +
+                    authNotifier.userDetails.displayLastName,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                  fontFamily: 'MuseoModerno',
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: TextFormField(
@@ -233,38 +250,36 @@ class _HomePageState extends State<HomePage> {
           Text(
             " Sélectionner votre periode de livraison !",
           ),
-          
-                          Container(
-                            width: 280,
-                            child: Row(
-                              children: <Widget>[
-                                Radio(
-                                    value: matin,
-                                    groupValue: bulbColor,
-                                    onChanged: (val) {
-                                      bulbColor = val;
-                                      setState(() {});
-                                    }),
-                                Text('Matin (7H30 - 12H30)')
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: 280,
-                            child: Row(
-                              children: <Widget>[
-                                Radio(
-                                    value: soir,
-                                    groupValue: bulbColor,
-                                    onChanged: (val) {
-                                      bulbColor = val;
-                                      setState(() {});
-                                    }),
-                                Text('Aprés midi (13H00 - 18H00)')
-                              ],
-                            ),
-                          ),
-
+          Container(
+            width: 280,
+            child: Row(
+              children: <Widget>[
+                Radio(
+                    value: matin,
+                    groupValue: bulbColor,
+                    onChanged: (val) {
+                      bulbColor = val;
+                      setState(() {});
+                    }),
+                Text('Matin (7H30 - 12H30)')
+              ],
+            ),
+          ),
+          Container(
+            width: 280,
+            child: Row(
+              children: <Widget>[
+                Radio(
+                    value: soir,
+                    groupValue: bulbColor,
+                    onChanged: (val) {
+                      bulbColor = val;
+                      setState(() {});
+                    }),
+                Text('Aprés midi (13H00 - 18H00)')
+              ],
+            ),
+          ),
           SizedBox(
             height: 20,
           ),
@@ -291,68 +306,6 @@ class _HomePageState extends State<HomePage> {
       ),
       /*child: Column(
                                                                                                                                               children: <Widget>[
-                                                                                                                                                Card(
-                                                                                                                                                  child: TextField(
-                                                                                                                                                    decoration: InputDecoration(
-                                                                                                                                                        prefixIcon: Icon(Icons.search), hintText: 'Search...'),
-                                                                                                                                                    onChanged: (val) {
-                                                                                                                                                      setState(() {
-                                                                                                                                                        name = val;
-                                                                                                                                                      });
-                                                                                                                                                    },
-                                                                                                                                                  ),
-                                                                                                                                                ),
-                                                                                                                                                StreamBuilder<QuerySnapshot>(
-                                                                                                                                                stream: Firestore.instance.collection('items').where('total_qty', isGreaterThan: 0).snapshots(),
-                                                                                                                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                                                                                                                                  if (snapshot.hasData && snapshot.data.documents.length > 0 ) {
-                                                                                                                                                    _foodItems = new List<Food>();
-                                                                                                                                                    snapshot.data.documents.forEach((item) {
-                                                                                                                                                      _foodItems.add(Food(item.documentID, item['item_name'], item['total_qty'], item['price']));
-                                                                                                                                                    });
-                                                                                                                                                    List<Food> _suggestionList = (name == '' || name == null) ? _foodItems
-                                                                                                                                                      : _foodItems.where((element) => element.itemName.toLowerCase().contains(name.toLowerCase())).toList();
-                                                                                                                                                    if(_suggestionList.length > 0){
-                                                                                                                                                      return Container(
-                                                                                                                                                        margin: EdgeInsets.only(top: 10.0),
-                                                                                                                                                        child:ListView.builder(
-                                                                                                                                                          shrinkWrap: true,
-                                                                                                                                                          physics: const NeverScrollableScrollPhysics(),
-                                                                                                                                                          itemCount: _suggestionList.length,
-                                                                                                                                                          itemBuilder: (context, int i) {
-                                                                                                                                                          return ListTile(
-                                                                                                                                                            title: Text(_suggestionList[i].itemName ?? ''),
-                                                                                                                                                            subtitle: Text('cost: ${_suggestionList[i].price.toString()}'),
-                                                                                                                                                            trailing: IconButton(
-                                                                                                                                                              icon: cartIds.contains(_suggestionList[i].id)? new Icon(Icons.remove):new Icon(Icons.add),
-                                                                                                                                                              onPressed: () async{
-                                                                                                                                                                cartIds.contains(_suggestionList[i].id)? 
-                                                                                                                                                                await removeFromCart(_suggestionList[i], context) : await addToCart(_suggestionList[i], context);
-                                                                                                                                                                setState(() {
-                                                                                                                                                                  getCart(authNotifier.userDetails.uuid);
-                                                                                                                                                                });
-                                                                                                                                                              },
-                                                                                                                                                            )
-                                                                                                                                                          );
-                                                                                                                                                        }),
-                                                                                                                                                      );
-                                                                                                                                                    } else {
-                                                                                                                                                      return Container(
-                                                                                                                                                        padding: EdgeInsets.symmetric(vertical: 20),
-                                                                                                                                                        width: MediaQuery.of(context).size.width * 0.6,
-                                                                                                                                                        child: Text("No Items to display"),
-                                                                                                                                                      );
-                                                                                                                                                    }
-                                                                                                                                                  } else {
-                                                                                                                                                    return Container(
-                                                                                                                                                      padding: EdgeInsets.symmetric(vertical: 20),
-                                                                                                                                                      width: MediaQuery.of(context).size.width * 0.6,
-                                                                                                                                                      child: Text("No Items to display"),
-                                                                                                                                                    );
-                                                                                                                                                  }
-                                                                                                                                                },
-                                                                                                                                              ),
-                                                                                                                                            ],
                                                                                                                                           ),*/
     );
   }
@@ -417,15 +370,59 @@ class _HomePageState extends State<HomePage> {
     this.autreDetail = autreDet;
   }
 
-  void createData() {
-   /* if(tel != 10){
+  void getCommune(dropdownValue) {
+    this.dropdownValue = dropdownValue;
+  }
+
+  void getPeriode(bulbColor) {
+    this.bulbColor = bulbColor;
+  }
+
+  Future<void> createData() async {
+    if ((adresLivraison == null) &&
+        (autreDetail == null) &&
+        (dateLivraison == null) &&
+        (quartiers == null)&& (bulbColor.toString() ==null) && (dropdownValue.toString()== null)) {
+      toast("Tous les champs doivent être remplir!!!");
+    } else if (int.parse(tel) == null) {
+      toast("Le numéro de téléphone doit être un nombre");
+    } else if (int.parse(nbrePoul) >= 1500) {
+      toast("Nombre limite de commande ne doit pas être supérieure : 1500");
+    } else if (tel.length != 10) {
+      toast("La longueur du numéro de téléphone doit être 10");
+    } else {
+      DocumentReference documentReference =
+          Firestore.instance.collection("commande").document();
+      FirebaseUser auth = await FirebaseAuth.instance.currentUser();
+
+      // create Map
+      Map<String, dynamic> commande = {
+        "nomPrenom": nomPrenom,
+        "adresLivraison": adresLivraison,
+        "quartiers": quartiers,
+        "autreDetail": autreDetail,
+        "nbrePoul": nbrePoul,
+        "tel": tel,
+        "commune": dropdownValue,
+        "dateLivraison": pickedDate,
+        "periode": bulbColor,
+        "userId": auth.uid,
+        "cmdID": cmdID,
+      };
+      documentReference.setData(commande).whenComplete(() {
+        toast("La commande de $nomPrenom a étè effectué avec success");
+      });
+    }
+  }
+  void updateData() {
+    /* if(tel != 10){
       toast("Contact number length must be 10");
     } else if(tel == null){
       toast("Contact number must be a number");
     } else if(nbrePoul == 1500){
       toast("Nombre limite de commande ne doit pas être supérieure : 1500");
     } else {*/
-      print("mozart est la");
+    print("mozart update est la");
     DocumentReference documentReference =
         Firestore.instance.collection("commande").document();
     // create Map
@@ -438,42 +435,13 @@ class _HomePageState extends State<HomePage> {
       "tel": tel,
       "commune": dropdownValue,
       "dateLivraison": pickedDate,
-      "periode": bulbColor
+      "periode": bulbColor,
+      "userId": ""
     };
 
     documentReference.setData(commande).whenComplete(() {
-            toast("La commande de $nomPrenom a étè effectué avec success");
+      toast("La commande de $nomPrenom a étè modifier avec success");
     });
     /*}*/
   }
- void updateData() {
-   /* if(tel != 10){
-      toast("Contact number length must be 10");
-    } else if(tel == null){
-      toast("Contact number must be a number");
-    } else if(nbrePoul == 1500){
-      toast("Nombre limite de commande ne doit pas être supérieure : 1500");
-    } else {*/
-      print("mozart update est la");
-    DocumentReference documentReference =
-        Firestore.instance.collection("commande").document();
-    // create Map
-    Map<String, dynamic> commande = {
-      "nomPrenom": nomPrenom,
-      "adresLivraison": adresLivraison,
-      "quartiers": quartiers,
-      "autreDetail": autreDetail,
-      "nbrePoul": nbrePoul,
-      "tel": tel,
-      "commune": dropdownValue,
-      "dateLivraison": pickedDate,
-      "periode": bulbColor
-    };
-
-    documentReference.setData(commande).whenComplete(() {
-            toast("La commande de $nomPrenom a étè modifier avec success");
-    });
-    /*}*/
-  }
-
 }

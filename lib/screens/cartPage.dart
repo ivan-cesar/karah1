@@ -1,8 +1,10 @@
 import 'package:canteen_food_ordering_app/apis/foodAPIs.dart';
 import 'package:canteen_food_ordering_app/models/cart.dart';
+import 'package:canteen_food_ordering_app/models/commande.dart';
 import 'package:canteen_food_ordering_app/notifiers/authNotifier.dart';
 import 'package:canteen_food_ordering_app/widgets/customRaisedButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:commons/commons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +16,7 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   double sum = 0;
   int itemsCount = 0;
-
+  Commande commande = new Commande();
   @override
   void initState() {
     AuthNotifier authNotifier =
@@ -44,31 +46,136 @@ class _CartPageState extends State<CartPage> {
   Widget cartList(context) {
     AuthNotifier authNotifier =
         Provider.of<AuthNotifier>(context, listen: false);
-    return SingleChildScrollView(
-      physics: ScrollPhysics(),
-      child: Column(
-        children: <Widget>[
-          StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance.collection('commande').snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                //print("${snapshot.data.documents.toString()}");
-                /* snapshot.data.documents.forEach((element){
-                      print(element["periode"]);
-                  });*/
-                return ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      DocumentSnapshot documentSnapshot =
-                          snapshot.data.documents[index];
-                      print('${documentSnapshot["periode"]}');
-                      return Card(
-                          child: Text('${documentSnapshot["periode"]}'));
-                    });
-               })
-        ],
-      ),
-    );
+    // String userId;
+    // Future.delayed(const Duration(milliseconds: 500), () async {
+    //   FirebaseAuth.instance.currentUser().then((value) {
+    //     // setState(() {
+    //     print(userId);
+    //     userId = value.uid;
+    //     // });
+    //   });
+    // });
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance
+            .collection('commande')
+            .where("userId", isEqualTo: authNotifier.user.uid)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          //print("${snapshot.data.documents.toString()}");
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          List<Commande> mesCommande = [];
+          if (snapshot != null && snapshot.data != null)
+            snapshot.data.documents.forEach((element) {
+              Commande maCommande = Commande(
+                adresLivraison: element['adresLivraison'],
+                autreDetail: element['autreDetail'],
+                commune: element['commune'],
+                dateLivraison: DateFormat('dd-MM-yyyy')
+                    .format(element['dateLivraison'].toDate()),
+                nbrePoul: element['nbrePoul'].toString(),
+                nomPrenom: element['nomPrenom'],
+                periode: element['periode'],
+                quatiers: element['quartiers'],
+                tel: element['tel'].toString(),
+              );
+              mesCommande.add(maCommande);
+            });
+          return ListView.builder(
+              // shrinkWrap: true,
+              itemCount: mesCommande.length,
+              itemBuilder: (BuildContext context, int index) {
+                // DocumentSnapshot documentSnapshot =
+                //     snapshot.data.documents[index];
+                // print('${snapshot.data.documents[index]["periode"]}');
+                print(mesCommande.toString());
+                print(mesCommande.length);
+                var b = 134;
+                return Card(
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          RaisedButton(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 15),
+                            color: Color.fromRGBO(255, 0, 0, 0.8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Text('Supprimer'),
+                            textColor: Colors.white,
+                            onPressed: () {
+                              print(
+                                  "Mozart est la , merci Seigneur!!!!!!!!!!!!!!!");
+                              deleteData(commande);
+                            },
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          RaisedButton(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 15),
+                            color: Color.fromRGBO(0, 255, 0, 0.8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Text('Modifier'),
+                            textColor: Colors.white,
+                            onPressed: () {
+                              // ignore: unnecessary_statements
+                              //deleteData;
+                              print(
+                                  "Mozart est la , merci Seigneur!!!!!!!!!!!!!!!");
+                              deleteData(commande);
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text("Adresse de Livraison: " +
+                                  mesCommande[index].adresLivraison !=
+                              null
+                          ? mesCommande[index].adresLivraison
+                          : "null"),
+                      Text(mesCommande[index].autreDetail != null
+                          ? mesCommande[index].autreDetail
+                          : "null"),
+                      Text(mesCommande[index].commune != null
+                          ? mesCommande[index].commune
+                          : "null"),
+                      Text(mesCommande[index].dateLivraison.toString() != null
+                          ? mesCommande[index].dateLivraison.toString()
+                          : "null"),
+                      Text(mesCommande[index].nbrePoul != null
+                          ? mesCommande[index].nbrePoul
+                          : "null"),
+                      Text(mesCommande[index].nomPrenom != null
+                          ? mesCommande[index].nomPrenom
+                          : "null"),
+                      Text(mesCommande[index].periode != null
+                          ? mesCommande[index].periode
+                          : "null"),
+                      Text(mesCommande[index].quatiers != null
+                          ? mesCommande[index].quatiers
+                          : "null"),
+                      Text(mesCommande[index].tel != null
+                          ? mesCommande[index].tel
+                          : "null"),
+                    ],
+                  ),
+                );
+              });
+        });
   }
 
   Widget dataDisplay(BuildContext context, String uid, List<String> foodIds,
