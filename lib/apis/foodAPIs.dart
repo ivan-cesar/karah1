@@ -11,9 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-
+ 
 ProgressDialog pr;
-
+ 
 readData() {
   DocumentReference documentReference =
       Firestore.instance.collection("commande").document();
@@ -21,7 +21,7 @@ readData() {
     print(datasnapshot.data);
   });
 }
-
+ 
 Future<void> deleteData(Commande commande) async {
   /* DocumentReference documentReference =
       Firestore.instance.collection("commande").document();
@@ -30,15 +30,15 @@ Future<void> deleteData(Commande commande) async {
   });*/
   try {
     //FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
-    DocumentReference documentReference =
-        Firestore.instance.collection('commande').document();
-    await documentReference
+    // DocumentReference documentReference =
+    //     Firestore.instance.collection('commande');
+    await Firestore.instance
         .collection('commande')
-        .document(commande.cmdID)
+        .document(commande.documentId)
         .delete()
         .catchError((e) => print(e))
         .then((value) => print("Success"));
-         var tst =commande.cmdID;
+    var tst = commande.documentId;
     print('mozart est...................: $tst');
   } catch (error) {
     pr.hide().then((isHidden) {
@@ -49,7 +49,28 @@ Future<void> deleteData(Commande commande) async {
     return;
   }
 }
-
+ 
+Future<void> updateData(Commande commande, Map<String, dynamic> data) async {
+  try {
+    //FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
+    DocumentReference documentReference =
+        Firestore.instance.collection('commande').document();
+    await documentReference
+        /*.document(currentUser.uid)*/
+        .collection('commande')
+        .document(commande.documentId)
+        .updateData(data)
+        .whenComplete(() => toast("Data updated successfully"));
+  } catch (error) {
+    pr.hide().then((isHidden) {
+      print(isHidden);
+    });
+    toast("Failed to update from cart!");
+    print(error);
+    return;
+  }
+}
+ 
 void toast(String data) {
   Fluttertoast.showToast(
       msg: data,
@@ -58,7 +79,7 @@ void toast(String data) {
       backgroundColor: Colors.grey,
       textColor: Colors.white);
 }
-
+ 
 login(User user, AuthNotifier authNotifier, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -75,7 +96,7 @@ login(User user, AuthNotifier authNotifier, BuildContext context) async {
     print(error);
     return;
   }
-
+ 
   try {
     if (authResult != null) {
       FirebaseUser firebaseUser = authResult.user;
@@ -123,7 +144,7 @@ login(User user, AuthNotifier authNotifier, BuildContext context) async {
     return;
   }
 }
-
+ 
 signUp(User user, AuthNotifier authNotifier, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -141,15 +162,15 @@ signUp(User user, AuthNotifier authNotifier, BuildContext context) async {
     print(error);
     return;
   }
-
+ 
   try {
     if (authResult != null) {
       UserUpdateInfo updateInfo = UserUpdateInfo();
       updateInfo.displayName = user.displayName;
-
+ 
       FirebaseUser firebaseUser = authResult.user;
       await firebaseUser.sendEmailVerification();
-
+ 
       if (firebaseUser != null) {
         await firebaseUser.updateProfile(updateInfo);
         await firebaseUser.reload();
@@ -176,7 +197,7 @@ signUp(User user, AuthNotifier authNotifier, BuildContext context) async {
     return;
   }
 }
-
+ 
 getUserDetails(AuthNotifier authNotifier) async {
   await Firestore.instance
       .collection('users')
@@ -189,14 +210,14 @@ getUserDetails(AuthNotifier authNotifier) async {
                 : print(value)
           });
 }
-
+ 
 uploadUserData(User user, bool userdataUpload) async {
   bool userDataUploadVar = userdataUpload;
   FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
-
+ 
   CollectionReference userRef = Firestore.instance.collection('users');
   CollectionReference cartRef = Firestore.instance.collection('carts');
-
+ 
   user.uuid = currentUser.uid;
   if (userDataUploadVar != true) {
     await userRef
@@ -214,7 +235,7 @@ uploadUserData(User user, bool userdataUpload) async {
   }
   print('user data uploaded successfully');
 }
-
+ 
 initializeCurrentUser(AuthNotifier authNotifier, BuildContext context) async {
   FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
   if (firebaseUser != null) {
@@ -222,10 +243,10 @@ initializeCurrentUser(AuthNotifier authNotifier, BuildContext context) async {
     await getUserDetails(authNotifier);
   }
 }
-
+ 
 signOut(AuthNotifier authNotifier, BuildContext context) async {
   await FirebaseAuth.instance.signOut();
-
+ 
   authNotifier.setUser(null);
   print('log out');
   Navigator.pushReplacement(
@@ -235,7 +256,7 @@ signOut(AuthNotifier authNotifier, BuildContext context) async {
     }),
   );
 }
-
+ 
 forgotPassword(
     User user, AuthNotifier authNotifier, BuildContext context) async {
   pr = new ProgressDialog(context,
@@ -257,7 +278,7 @@ forgotPassword(
   toast("Reset Email has sent successfully");
   Navigator.pop(context);
 }
-
+ 
 addToCart(Food food, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -296,7 +317,7 @@ addToCart(Food food, BuildContext context) async {
   });
   toast("Added to cart successfully!");
 }
-
+ 
 removeFromCart(Food food, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -324,7 +345,7 @@ removeFromCart(Food food, BuildContext context) async {
   });
   toast("Removed from cart successfully!");
 }
-
+ 
 addNewItem(
     String itemName, int price, int totalQty, BuildContext context) async {
   pr = new ProgressDialog(context,
@@ -351,7 +372,7 @@ addNewItem(
   Navigator.pop(context);
   toast("New Item added successfully!");
 }
-
+ 
 editItem(String itemName, int price, int totalQty, BuildContext context,
     String id) async {
   pr = new ProgressDialog(context,
@@ -378,7 +399,7 @@ editItem(String itemName, int price, int totalQty, BuildContext context,
   Navigator.pop(context);
   toast("Item edited successfully!");
 }
-
+ 
 deleteItem(String id, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -404,7 +425,7 @@ deleteItem(String id, BuildContext context) async {
   Navigator.pop(context);
   toast("Item edited successfully!");
 }
-
+ 
 editCartItem(String itemId, int count, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -442,7 +463,7 @@ editCartItem(String itemId, int count, BuildContext context) async {
   });
   toast("Cart updated successfully!");
 }
-
+ 
 addMoney(int amount, BuildContext context, String id) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -474,7 +495,7 @@ addMoney(int amount, BuildContext context, String id) async {
   );
   toast("Money added successfully!");
 }
-
+ 
 placeOrder(BuildContext context, double total) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -486,11 +507,11 @@ placeOrder(BuildContext context, double total) async {
     CollectionReference orderRef = Firestore.instance.collection('orders');
     CollectionReference itemRef = Firestore.instance.collection('items');
     CollectionReference userRef = Firestore.instance.collection('users');
-
+ 
     List<String> foodIds = new List<String>();
     Map<String, int> count = new Map<String, int>();
     List<dynamic> _cartItems = new List<dynamic>();
-
+ 
     // Checking user balance
     /*DocumentSnapshot userData = await userRef.document(currentUser.uid).get();
     if(userData.data['balance'] < total){
@@ -500,7 +521,7 @@ placeOrder(BuildContext context, double total) async {
       toast("You dont have succifient balance to place this order!");
       return;
     }*/
-
+ 
     // Getting all cart items of the user
     QuerySnapshot data = await cartRef
         .document(currentUser.uid)
@@ -510,7 +531,7 @@ placeOrder(BuildContext context, double total) async {
       foodIds.add(item.documentID);
       count[item.documentID] = item.data['count'];
     });
-
+ 
     // Checking for item availability
     QuerySnapshot snap = await itemRef
         .where(FieldPath.documentId, whereIn: foodIds)
@@ -527,7 +548,7 @@ placeOrder(BuildContext context, double total) async {
         return;
       }
     }
-
+ 
     // Creating cart items array
     snap.documents.forEach((item) {
       _cartItems.add({
@@ -537,7 +558,7 @@ placeOrder(BuildContext context, double total) async {
         "price": item.data['price']
       });
     });
-
+ 
     // Creating a transaction
     await Firestore.instance.runTransaction((Transaction transaction) async {
       // Update the item count in items table
@@ -547,12 +568,12 @@ placeOrder(BuildContext context, double total) async {
               count[snap.documents[i].documentID]
         });
       }
-
+ 
       // Deduct amount from user
       await userRef
           .document(currentUser.uid)
           .updateData({'balance': FieldValue.increment(-1 * total)});
-
+ 
       // Place a new order
       await orderRef.document().setData({
         "items": _cartItems,
@@ -561,7 +582,7 @@ placeOrder(BuildContext context, double total) async {
         "placed_at": DateTime.now(),
         "placed_by": currentUser.uid
       });
-
+ 
       // Empty cart
       for (var i = 0; i < data.documents.length; i++) {
         await transaction.delete(data.documents[i].reference);
@@ -569,7 +590,7 @@ placeOrder(BuildContext context, double total) async {
       print("in in");
       // return;
     });
-
+ 
     // Successfull transaction
     pr.hide().then((isHidden) {
       print(isHidden);
@@ -592,7 +613,7 @@ placeOrder(BuildContext context, double total) async {
     return;
   }
 }
-
+ 
 orderReceived(String id, BuildContext context) async {
   pr = new ProgressDialog(context,
       type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);

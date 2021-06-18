@@ -2,21 +2,27 @@ import 'package:canteen_food_ordering_app/apis/foodAPIs.dart';
 import 'package:canteen_food_ordering_app/models/cart.dart';
 import 'package:canteen_food_ordering_app/models/commande.dart';
 import 'package:canteen_food_ordering_app/notifiers/authNotifier.dart';
+import 'package:canteen_food_ordering_app/screens/homePage.dart';
 import 'package:canteen_food_ordering_app/widgets/customRaisedButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:commons/commons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:uuid/uuid.dart';
+ 
+import '../apis/foodAPIs.dart';
+ 
 class CartPage extends StatefulWidget {
   @override
   _CartPageState createState() => _CartPageState();
 }
-
+ 
 class _CartPageState extends State<CartPage> {
   double sum = 0;
   int itemsCount = 0;
   Commande commande = new Commande();
+  String adresLivraison;
   @override
   void initState() {
     AuthNotifier authNotifier =
@@ -24,7 +30,7 @@ class _CartPageState extends State<CartPage> {
     getUserDetails(authNotifier);
     super.initState();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     AuthNotifier authNotifier =
@@ -42,7 +48,7 @@ class _CartPageState extends State<CartPage> {
               )
             : cartList(context));
   }
-
+ 
   Widget cartList(context) {
     AuthNotifier authNotifier =
         Provider.of<AuthNotifier>(context, listen: false);
@@ -55,7 +61,7 @@ class _CartPageState extends State<CartPage> {
     //     // });
     //   });
     // });
-
+ 
     return StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
             .collection('commande')
@@ -80,6 +86,7 @@ class _CartPageState extends State<CartPage> {
                 nbrePoul: element['nbrePoul'].toString(),
                 nomPrenom: element['nomPrenom'],
                 periode: element['periode'],
+                documentId: element['documentId'],
                 quatiers: element['quartiers'],
                 tel: element['tel'].toString(),
               );
@@ -115,7 +122,7 @@ class _CartPageState extends State<CartPage> {
                             onPressed: () {
                               print(
                                   "Mozart est la , merci Seigneur!!!!!!!!!!!!!!!");
-                              deleteData(commande);
+                              deleteData(mesCommande[index]);
                             },
                           ),
                           SizedBox(
@@ -130,11 +137,11 @@ class _CartPageState extends State<CartPage> {
                             child: Text('Modifier'),
                             textColor: Colors.white,
                             onPressed: () {
-                              // ignore: unnecessary_statements
-                              //deleteData;
-                              print(
-                                  "Mozart est la , merci Seigneur!!!!!!!!!!!!!!!");
-                              deleteData(commande);
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (BuildContext context) {
+                                  return HomePage();
+                                },
+                              ));
                             },
                           ),
                         ],
@@ -177,7 +184,7 @@ class _CartPageState extends State<CartPage> {
               });
         });
   }
-
+ 
   Widget dataDisplay(BuildContext context, String uid, List<String> foodIds,
       Map<String, int> count) {
     return StreamBuilder<QuerySnapshot>(
@@ -292,7 +299,7 @@ class _CartPageState extends State<CartPage> {
       },
     );
   }
-
+ 
   showAlertDialog(BuildContext context, String data) {
     // set up the buttons
     Widget cancelButton = FlatButton(
@@ -307,7 +314,7 @@ class _CartPageState extends State<CartPage> {
         placeOrder(context, sum);
       },
     );
-
+ 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Proceed to checkout?"),
@@ -317,7 +324,7 @@ class _CartPageState extends State<CartPage> {
         continueButton,
       ],
     );
-
+ 
     // show the dialog
     showDialog(
       context: context,

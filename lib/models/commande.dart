@@ -8,9 +8,9 @@ class Commande {
   String periode;
   String quatiers;
   String tel;
-  String cmdID;
+  String documentId;
   Commande(
-      {this.cmdID,
+      {this.documentId,
       this.adresLivraison,
       this.autreDetail,
       this.commune,
@@ -23,7 +23,7 @@ class Commande {
 
   @override
   String toString() {
-    return 'Commande{cmdID:$cmdID, adresLivraison: $adresLivraison, autreDetail: $autreDetail, commune: $commune, dateLivraison: $dateLivraison, nbrePoul: $nbrePoul, nomPrenom: $nomPrenom, periode: $periode, quatiers: $quatiers, tel: $tel}';
+    return 'Commande{documentId:$documentId, adresLivraison: $adresLivraison, autreDetail: $autreDetail, commune: $commune, dateLivraison: $dateLivraison, nbrePoul: $nbrePoul, nomPrenom: $nomPrenom, periode: $periode, quatiers: $quatiers, tel: $tel}';
   }
   
 }
