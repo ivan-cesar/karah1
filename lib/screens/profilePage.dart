@@ -51,6 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -101,12 +102,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   )
                 : Text("You don't have a user name"),
-            SizedBox(
+           SizedBox(
               height: 10,
             ),
-            authNotifier.userDetails.balance != null
+            authNotifier.userDetails.location !=null
             ? Text(
-                "Balance: ${authNotifier.userDetails.balance} INR",
+                authNotifier.userDetails.location,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 20,
@@ -114,18 +115,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               )
             : 
-            Text(
-              "Balance: 0 INR",
+            Text("You don't have a user name",),
+            SizedBox(
+              height: 20,
+            ),
+            authNotifier.userDetails.phone !=null
+                ? Text(
+              authNotifier.userDetails.phone,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20,
                 fontFamily: 'MuseoModerno',
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
+            )
+                :
+            Text("You don't have a user name",),
+           /* GestureDetector(
               onTap: (){
                 showDialog(
                   context: context,
@@ -149,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               textAlign: TextAlign.left,
             ),
-            myOrders(authNotifier.userDetails.uuid),
+            myOrders(authNotifier.userDetails.uuid),*/
           ],
         ),
       ),

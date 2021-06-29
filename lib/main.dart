@@ -1,9 +1,11 @@
 import 'package:canteen_food_ordering_app/screens/constants.dart';
+import 'package:canteen_food_ordering_app/screens/navigationBar.dart';
 import 'package:canteen_food_ordering_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:canteen_food_ordering_app/screens/landingPage.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'notifiers/authNotifier.dart';
 
 // void main() {
@@ -33,7 +35,10 @@ void main() {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Future<Widget> build(BuildContext context) async {
+    SharedPreferences prefs =  await SharedPreferences.getInstance();
+    var status = prefs.getBool('isLoggedIn') ?? false;
+    print(status);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Kara',
@@ -41,9 +46,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat',
         primaryColor:  kPrimaryColor,
       ),
-      home: Scaffold(
-        body: SplashScreen(),
-      ),
+      home: status == true ?  Scaffold(
+        body: SplashScreen()):NavigationBarPage(selectedIndex: 2),
+
     );
   }
 }

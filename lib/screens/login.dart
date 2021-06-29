@@ -52,11 +52,12 @@ class _LoginPageState extends State<LoginPage> {
         Provider.of<AuthNotifier>(context, listen: false);
     RegExp regExp = new RegExp(
         r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
-    if ('${_user.phone.trim()}@gmail.com'==null) {
-      toast("Entrez un numero valide");
+    if ('${_user.phone.trim()}@gmail.com'==null && '${_user.phone.trim()}@gmail.com'==null) {
+      toast("Vous n'avez pas de compte");
     } else if (_user.password.length < 8) {
-      toast("Password must have atleast 8 characters");
-    } else {
+      toast("Le mot de passe doit avoir au moins 8 caractères");
+    }
+    else {
       print("Success");
       login(_user, authNotifier, context);
     }
@@ -66,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: <Widget>[
         SizedBox(
-          height: 120,
+          height: 50,
         ),
         // Email Text Field
         Container(
@@ -79,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           child: TextFormField(
             controller: phoneController,
-            keyboardType: TextInputType.phone,
+            keyboardType: TextInputType.number,
             validator: (String value) {
               return null;
             },
@@ -355,7 +356,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),*/
                 SizedBox(
-                  height: 50,
+                  height: 80,
                 ),
                 Container(
                   width: 100.0,
@@ -365,6 +366,7 @@ class _LoginPageState extends State<LoginPage> {
                           image: new AssetImage("images/logo_karah.png"),
                           fit: BoxFit.cover)),
                 ),
+                SizedBox(height: 50,),
                 Text(
                   'Connectez vous !',
                   style: TextStyle(
@@ -374,6 +376,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Color.fromRGBO(1, 70, 134, 1.0),
                   ),
                 ),
+                SizedBox(height: 20,),
                 Text(
                   'Entrez avec vos identifiants pour \n créer, suivre ou annuler une commande.',
                   style: TextStyle(

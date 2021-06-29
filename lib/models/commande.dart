@@ -8,6 +8,8 @@ class Commande {
   String periode;
   String quatiers;
   String tel;
+  String cmdId;
+  bool statutLivraison;
   String documentId;
   Commande(
       {this.documentId,
@@ -19,11 +21,13 @@ class Commande {
       this.nomPrenom,
       this.periode,
       this.quatiers,
+        this.statutLivraison,
+        this.cmdId,
       this.tel});
 
   @override
   String toString() {
-    return 'Commande{documentId:$documentId, adresLivraison: $adresLivraison, autreDetail: $autreDetail, commune: $commune, dateLivraison: $dateLivraison, nbrePoul: $nbrePoul, nomPrenom: $nomPrenom, periode: $periode, quatiers: $quatiers, tel: $tel}';
+    return 'Commande{documentId:$documentId, adresLivraison: $adresLivraison, autreDetail: $autreDetail, commune: $commune, dateLivraison: $dateLivraison, nbrePoul: $nbrePoul, nomPrenom: $nomPrenom, periode: $periode, quatiers: $quatiers, tel: $tel, statutLivraison: $statutLivraison, cmdId:$cmdId,}';
   }
-  
+
 }

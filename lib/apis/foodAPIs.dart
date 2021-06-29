@@ -2,6 +2,7 @@ import 'package:canteen_food_ordering_app/models/commande.dart';
 import 'package:canteen_food_ordering_app/models/food.dart';
 import 'package:canteen_food_ordering_app/models/user.dart';
 import 'package:canteen_food_ordering_app/notifiers/authNotifier.dart';
+import 'package:canteen_food_ordering_app/screens/accueilPage.dart';
 import 'package:canteen_food_ordering_app/screens/adminHome.dart';
 import 'package:canteen_food_ordering_app/screens/login.dart';
 import 'package:canteen_food_ordering_app/screens/navigationBar.dart';
@@ -50,9 +51,9 @@ Future<void> deleteData(Commande commande) async {
   }
 }
  
-Future<void> updateData(Commande commande, Map<String, dynamic> data) async {
+Future<void> updateMData(Commande commande, Map<String, dynamic> data) async {
   try {
-    //FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
+    FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
     DocumentReference documentReference =
         Firestore.instance.collection('commande').document();
     await documentReference
@@ -90,6 +91,7 @@ login(User user, AuthNotifier authNotifier, BuildContext context) async {
         email: '${user.phone}@gmail.com'.trim(), password: user.password);
   } catch (error) {
     pr.hide().then((isHidden) {
+      toast("Vous n'avez pas de compte");
       print(isHidden);
     });
     toast(error.message.toString());
@@ -126,10 +128,12 @@ login(User user, AuthNotifier authNotifier, BuildContext context) async {
             }),
           );
         } else {
+          Navigator.popUntil(context, (route) => route.isFirst);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (BuildContext context) {
-              return NavigationBarPage(selectedIndex: 1);
+              return //FirstRoute();
+              NavigationBarPage(selectedIndex: 2);
             }),
           );
         }
@@ -246,7 +250,7 @@ initializeCurrentUser(AuthNotifier authNotifier, BuildContext context) async {
  
 signOut(AuthNotifier authNotifier, BuildContext context) async {
   await FirebaseAuth.instance.signOut();
- 
+
   authNotifier.setUser(null);
   print('log out');
   Navigator.pushReplacement(

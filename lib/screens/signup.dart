@@ -185,7 +185,7 @@ class _SignupPageState extends State<SignupPage> {
             onSaved: (String value) {
               _user.phone = value;
             },
-            keyboardType: TextInputType.phone,
+            keyboardType: TextInputType.number,
             cursorColor:Color.fromRGBO(1, 70, 134, 1.0),
             decoration: InputDecoration(
               border: InputBorder.none,

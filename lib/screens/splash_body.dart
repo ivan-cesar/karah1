@@ -60,13 +60,12 @@ class _BodyState extends State<Body> {
               ),
             ),
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenWidth(20)),
+                    horizontal: getProportionateScreenWidth(15)),
                 child: Column(
                   children: <Widget>[
-                    Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
@@ -78,7 +77,7 @@ class _BodyState extends State<Body> {
                     DefaultButton(
                       text: "SE CONNECTER",
                       press: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) =>  LoginPage()),
                         );
